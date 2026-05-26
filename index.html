@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kontrol Lampu Pintar IoT</title>
     <style>
-        /* Latar Belakang Gradasi Animasi agar efek kaca terlihat */
+        /* Latar Belakang Gradasi Animasi */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             text-align: center; 
@@ -18,6 +18,7 @@
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: white;
+            padding: 20px 0;
         }
 
         @keyframes gradientBG {
@@ -26,15 +27,15 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* EFEK GLASSMORPHISM PADA KOTAK UTAMA */
+        /* EFEK GLASSMORPHISM */
         .card { 
-            background: rgba(255, 255, 255, 0.15); /* Latar belakang putih transparan */
-            backdrop-filter: blur(12px); /* Efek Blur utama */
-            -webkit-backdrop-filter: blur(12px); /* Dukungan untuk Safari */
-            border: 1px solid rgba(255, 255, 255, 0.3); /* Garis tepi kaca */
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.3); 
             border-radius: 20px; 
-            padding: 40px 30px; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Bayangan kedalaman */
+            padding: 30px 20px; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
             display: inline-block; 
             max-width: 400px; 
             width: 90%;
@@ -47,7 +48,7 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Gaya Tombol Glass */
+        /* Gaya Tombol */
         button { 
             padding: 12px 24px; 
             font-size: 16px; 
@@ -64,11 +65,11 @@
         .btn-on { background: rgba(40, 167, 69, 0.6); }
         .btn-off { background: rgba(220, 53, 69, 0.6); }
 
-        /* Gaya Input & Select Glass */
+        /* Gaya Input & Select */
         select { 
             padding: 10px; 
             font-size: 16px; 
-            width: 85%; 
+            width: 90%; 
             margin-top: 10px; 
             border-radius: 10px; 
             cursor: pointer; 
@@ -78,25 +79,10 @@
             outline: none;
             backdrop-filter: blur(5px);
         }
-        
-        select option { background: #23a6d5; color: white; } /* Latar solid agar teks opsi bisa dibaca */
-
-        input[type="color"] { 
-            margin-top: 15px; 
-            width: 60px; 
-            height: 60px; 
-            cursor: pointer; 
-            border: 2px solid rgba(255,255,255,0.4); 
-            border-radius: 50%;
-            background: transparent;
-            overflow: hidden;
-        }
-        
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+        select option { background: #23a6d5; color: white; } 
 
         input[type="range"] { 
-            width: 85%; 
+            width: 90%; 
             margin-top: 10px; 
             cursor: pointer; 
             accent-color: #fff;
@@ -109,6 +95,13 @@
             margin-top: 25px; 
             font-size: 1.1em;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Wadah untuk Roda Warna */
+        #colorPickerContainer {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -139,8 +132,8 @@
         </div>
 
         <div class="section">
-            <label for="colorPicker"><b>Pilih Warna:</b></label><br>
-            <input type="color" id="colorPicker" value="#ffffff" onchange="setWarna()">
+            <label><b>Pilih Warna:</b></label><br>
+            <div id="colorPickerContainer"></div>
         </div>
 
         <div class="section">
@@ -150,6 +143,8 @@
         
         <p id="statusText" style="color: #ffffff;">Status: Menghubungkan...</p>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -175,28 +170,44 @@
         const lampuKecerahanRef = database.ref('lampu/kecerahan');
         const lampuEfekRef = database.ref('lampu/efek'); 
 
-        // Update teks dengan warna cerah agar terlihat di atas glass background
-        lampuStatusRef.on('value', (snapshot) => {
-            const status = snapshot.val();
-            document.getElementById('statusText').innerText = status === 1 ? "Status Saat Ini: NYALA 🟢" : "Status Saat Ini: MATI 🔴";
-            document.getElementById('statusText').style.color = status === 1 ? "#66ff99" : "#ff6666";
+        // 1. Inisialisasi Roda Warna (Color Wheel)
+        var colorPicker = new iro.ColorPicker("#colorPickerContainer", {
+            width: 200,          // Ukuran roda warna
+            color: "#ffffff",    // Warna bawaan awal
+            borderWidth: 2,      // Bingkai agar cocok dengan glassmorphism
+            borderColor: "rgba(255, 255, 255, 0.4)",
+            layout: [
+                { 
+                    component: iro.ui.Wheel // Hanya menampilkan roda warna bulat
+                }
+            ]
         });
 
-        function setLampu(nilai) {
-            lampuStatusRef.set(nilai);
-        }
-
-        function setWarna() {
-            const warnaBaru = document.getElementById('colorPicker').value;
+        // 2. Event Listener Roda Warna (Hanya mengirim saat sentuhan dilepas)
+        colorPicker.on('input:end', function(color) {
+            const warnaBaru = color.hexString;
             lampuWarnaRef.set(warnaBaru);
             
+            // Otomatis pindah ke mode statis jika sedang di mode pelangi
             const efekSaatIni = parseInt(document.getElementById('efekSelect').value);
             if(efekSaatIni === 1 || efekSaatIni === 8) {
                 document.getElementById('efekSelect').value = 0; 
                 lampuEfekRef.set(0);
             }
             
-            setLampu(1); 
+            setLampu(1); // Nyalakan otomatis
+        });
+
+        // 3. Monitor Status Teks
+        lampuStatusRef.on('value', (snapshot) => {
+            const status = snapshot.val();
+            document.getElementById('statusText').innerText = status === 1 ? "Status Saat Ini: NYALA 🟢" : "Status Saat Ini: MATI 🔴";
+            document.getElementById('statusText').style.color = status === 1 ? "#66ff99" : "#ff6666";
+        });
+
+        // 4. Fungsi-fungsi Kontrol
+        function setLampu(nilai) {
+            lampuStatusRef.set(nilai);
         }
 
         function updateLabelKecerahan() {
