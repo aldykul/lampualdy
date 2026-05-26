@@ -5,26 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kontrol Lampu Pintar IoT</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9;}
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; max-width: 400px; width: 90%;}
-        button { padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; color: white; margin: 5px; transition: 0.2s;}
-        button:hover { opacity: 0.8; }
-        .btn-on { background-color: #28a745; }
-        .btn-off { background-color: #dc3545; }
-        input[type="color"] { margin-top: 15px; width: 60px; height: 60px; cursor: pointer; border: none; border-radius: 5px;}
-        input[type="range"] { width: 80%; margin-top: 10px; cursor: pointer; }
-        .section { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
-        #statusText { font-weight: bold; margin-top: 20px; color: #555; }
+        /* Latar Belakang Gradasi Animasi agar efek kaca terlihat */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* EFEK GLASSMORPHISM PADA KOTAK UTAMA */
+        .card { 
+            background: rgba(255, 255, 255, 0.15); /* Latar belakang putih transparan */
+            backdrop-filter: blur(12px); /* Efek Blur utama */
+            -webkit-backdrop-filter: blur(12px); /* Dukungan untuk Safari */
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Garis tepi kaca */
+            border-radius: 20px; 
+            padding: 40px 30px; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Bayangan kedalaman */
+            display: inline-block; 
+            max-width: 400px; 
+            width: 90%;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Gaya Tombol Glass */
+        button { 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.4); 
+            border-radius: 30px; 
+            color: white; 
+            margin: 5px; 
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .btn-on { background: rgba(40, 167, 69, 0.6); }
+        .btn-off { background: rgba(220, 53, 69, 0.6); }
+
+        /* Gaya Input & Select Glass */
+        select { 
+            padding: 10px; 
+            font-size: 16px; 
+            width: 85%; 
+            margin-top: 10px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            background: rgba(255, 255, 255, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            outline: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        select option { background: #23a6d5; color: white; } /* Latar solid agar teks opsi bisa dibaca */
+
+        input[type="color"] { 
+            margin-top: 15px; 
+            width: 60px; 
+            height: 60px; 
+            cursor: pointer; 
+            border: 2px solid rgba(255,255,255,0.4); 
+            border-radius: 50%;
+            background: transparent;
+            overflow: hidden;
+        }
+        
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+        input[type="range"] { 
+            width: 85%; 
+            margin-top: 10px; 
+            cursor: pointer; 
+            accent-color: #fff;
+        }
+
+        .section { margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
+        
+        #statusText { 
+            font-weight: bold; 
+            margin-top: 25px; 
+            font-size: 1.1em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h2>Smart Lamp IoT</h2>
+        <h2>✨ Smart Lamp IoT ✨</h2>
         
         <div>
             <button class="btn-on" onclick="setLampu(1)">NYALAKAN</button>
             <button class="btn-off" onclick="setLampu(0)">MATIKAN</button>
+        </div>
+
+        <div class="section">
+            <label for="efekSelect"><b>Pilih Efek Animasi (10 Mode):</b></label><br>
+            <select id="efekSelect" onchange="setEfek()">
+                <option value="0">Statis (Satu Warna)</option>
+                <option value="1">Pelangi Berputar</option>
+                <option value="2">Lampu Berjalan</option>
+                <option value="3">Kedip (Blink)</option>
+                <option value="4">Bernapas (Breathing)</option>
+                <option value="5">Bolak-Balik (Scanner)</option>
+                <option value="6">Kelap-Kelip (Sparkle)</option>
+                <option value="7">Sapuan Warna (Color Wipe)</option>
+                <option value="8">Pelangi Berjalan (Theater Rainbow)</option>
+                <option value="9">Meteor Jatuh (Meteor Rain)</option>
+            </select>
         </div>
 
         <div class="section">
@@ -37,14 +148,14 @@
             <input type="range" id="brightnessSlider" min="0" max="255" value="255" oninput="updateLabelKecerahan()" onchange="setKecerahan()">
         </div>
         
-        <p id="statusText">Status: Menghubungkan ke Database...</p>
+        <p id="statusText" style="color: #ffffff;">Status: Menghubungkan...</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <script>
-        // Konfigurasi Firebase Anda
+        // Konfigurasi Web App Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyDKIKwNt45Fak_3kuiIEKf5KfySsIP9dUc",
             authDomain: "lampu-pintar-iot.firebaseapp.com",
@@ -56,44 +167,50 @@
             measurementId: "G-8REM3XB48F"
         };
 
-        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Referensi Jalur Data di Realtime Database
         const lampuStatusRef = database.ref('lampu/status');
         const lampuWarnaRef = database.ref('lampu/warna');
         const lampuKecerahanRef = database.ref('lampu/kecerahan');
+        const lampuEfekRef = database.ref('lampu/efek'); 
 
-        // Update teks di web jika ada perubahan status di database (Realtime)
+        // Update teks dengan warna cerah agar terlihat di atas glass background
         lampuStatusRef.on('value', (snapshot) => {
             const status = snapshot.val();
-            document.getElementById('statusText').innerText = status === 1 ? "Status Saat Ini: NYALA" : "Status Saat Ini: MATI";
-            document.getElementById('statusText').style.color = status === 1 ? "#28a745" : "#dc3545";
+            document.getElementById('statusText').innerText = status === 1 ? "Status Saat Ini: NYALA 🟢" : "Status Saat Ini: MATI 🔴";
+            document.getElementById('statusText').style.color = status === 1 ? "#66ff99" : "#ff6666";
         });
 
-        // Fungsi Tombol Nyala/Mati
         function setLampu(nilai) {
             lampuStatusRef.set(nilai);
         }
 
-        // Fungsi Ubah Warna
         function setWarna() {
             const warnaBaru = document.getElementById('colorPicker').value;
             lampuWarnaRef.set(warnaBaru);
-            setLampu(1); // Otomatis nyalakan lampu jika warna diubah
+            
+            const efekSaatIni = parseInt(document.getElementById('efekSelect').value);
+            if(efekSaatIni === 1 || efekSaatIni === 8) {
+                document.getElementById('efekSelect').value = 0; 
+                lampuEfekRef.set(0);
+            }
+            
+            setLampu(1); 
         }
 
-        // Fungsi Update Angka Kecerahan di layar saat slider digeser
         function updateLabelKecerahan() {
-            const nilaiKecerahan = document.getElementById('brightnessSlider').value;
-            document.getElementById('kecerahanValue').innerText = nilaiKecerahan;
+            document.getElementById('kecerahanValue').innerText = document.getElementById('brightnessSlider').value;
+        }
+        
+        function setKecerahan() {
+            lampuKecerahanRef.set(parseInt(document.getElementById('brightnessSlider').value));
         }
 
-        // Fungsi Kirim Nilai Kecerahan ke Firebase saat slider dilepas
-        function setKecerahan() {
-            const nilaiKecerahan = parseInt(document.getElementById('brightnessSlider').value);
-            lampuKecerahanRef.set(nilaiKecerahan);
+        function setEfek() {
+            const efekBaru = parseInt(document.getElementById('efekSelect').value);
+            lampuEfekRef.set(efekBaru);
+            setLampu(1); 
         }
     </script>
 </body>
