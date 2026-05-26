@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontrol Lampu Pintar IoT</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9;}
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: inline-block; max-width: 400px; width: 90%;}
+        button { padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; color: white; margin: 5px; transition: 0.2s;}
+        button:hover { opacity: 0.8; }
+        .btn-on { background-color: #28a745; }
+        .btn-off { background-color: #dc3545; }
+        input[type="color"] { margin-top: 15px; width: 60px; height: 60px; cursor: pointer; border: none; border-radius: 5px;}
+        input[type="range"] { width: 80%; margin-top: 10px; cursor: pointer; }
+        .section { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
+        #statusText { font-weight: bold; margin-top: 20px; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Smart Lamp IoT</h2>
+        
+        <div>
+            <button class="btn-on" onclick="setLampu(1)">NYALAKAN</button>
+            <button class="btn-off" onclick="setLampu(0)">MATIKAN</button>
+        </div>
+
+        <div class="section">
+            <label for="colorPicker"><b>Pilih Warna:</b></label><br>
+            <input type="color" id="colorPicker" value="#ffffff" onchange="setWarna()">
+        </div>
+
+        <div class="section">
+            <label for="brightnessSlider"><b>Kecerahan:</b> <span id="kecerahanValue">255</span></label><br>
+            <input type="range" id="brightnessSlider" min="0" max="255" value="255" oninput="updateLabelKecerahan()" onchange="setKecerahan()">
+        </div>
+        
+        <p id="statusText">Status: Menghubungkan ke Database...</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKIKwNt45Fak_3kuiIEKf5KfySsIP9dUc",
+            authDomain: "lampu-pintar-iot.firebaseapp.com",
+            databaseURL: "https://lampu-pintar-iot-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "lampu-pintar-iot",
+            storageBucket: "lampu-pintar-iot.firebasestorage.app",
+            messagingSenderId: "472487300387",
+            appId: "1:472487300387:web:ee880a9bf03d52299a9096",
+            measurementId: "G-8REM3XB48F"
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Referensi Jalur Data di Realtime Database
+        const lampuStatusRef = database.ref('lampu/status');
+        const lampuWarnaRef = database.ref('lampu/warna');
+        const lampuKecerahanRef = database.ref('lampu/kecerahan');
+
+        // Update teks di web jika ada perubahan status di database (Realtime)
+        lampuStatusRef.on('value', (snapshot) => {
+            const status = snapshot.val();
+            document.getElementById('statusText').innerText = status === 1 ? "Status Saat Ini: NYALA" : "Status Saat Ini: MATI";
+            document.getElementById('statusText').style.color = status === 1 ? "#28a745" : "#dc3545";
+        });
+
+        // Fungsi Tombol Nyala/Mati
+        function setLampu(nilai) {
+            lampuStatusRef.set(nilai);
+        }
+
+        // Fungsi Ubah Warna
+        function setWarna() {
+            const warnaBaru = document.getElementById('colorPicker').value;
+            lampuWarnaRef.set(warnaBaru);
+            setLampu(1); // Otomatis nyalakan lampu jika warna diubah
+        }
+
+        // Fungsi Update Angka Kecerahan di layar saat slider digeser
+        function updateLabelKecerahan() {
+            const nilaiKecerahan = document.getElementById('brightnessSlider').value;
+            document.getElementById('kecerahanValue').innerText = nilaiKecerahan;
+        }
+
+        // Fungsi Kirim Nilai Kecerahan ke Firebase saat slider dilepas
+        function setKecerahan() {
+            const nilaiKecerahan = parseInt(document.getElementById('brightnessSlider').value);
+            lampuKecerahanRef.set(nilaiKecerahan);
+        }
+    </script>
+</body>
+</html>
