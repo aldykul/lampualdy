@@ -5,104 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kontrol Lampu Pintar IoT</title>
     <style>
-        /* Latar Belakang Gradasi Animasi */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            margin: 0; 
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            text-align: center; margin: 0; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: white;
-            padding: 20px 0;
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; padding: 20px 0;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* EFEK GLASSMORPHISM */
         .card { 
-            background: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.3); 
-            border-radius: 20px; 
-            padding: 30px 20px; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); 
-            display: inline-block; 
-            max-width: 400px; 
-            width: 90%;
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 30px 20px; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); display: inline-block; max-width: 400px; width: 90%;
         }
 
-        h2 {
-            margin-top: 0;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        h2 { margin-top: 0; font-weight: 600; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        /* Gaya Tombol */
         button { 
-            padding: 12px 24px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            border: 1px solid rgba(255,255,255,0.4); 
-            border-radius: 30px; 
-            color: white; 
-            margin: 5px; 
-            transition: all 0.3s ease;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            padding: 12px 24px; font-size: 16px; font-weight: bold; cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.4); border-radius: 30px; color: white; 
+            margin: 5px; transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .btn-on { background: rgba(40, 167, 69, 0.6); }
         .btn-off { background: rgba(220, 53, 69, 0.6); }
 
-        /* Gaya Input & Select */
         select { 
-            padding: 10px; 
-            font-size: 16px; 
-            width: 90%; 
-            margin-top: 10px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            background: rgba(255, 255, 255, 0.2); 
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            color: white;
-            outline: none;
-            backdrop-filter: blur(5px);
+            padding: 10px; font-size: 16px; width: 90%; margin-top: 10px; border-radius: 10px; 
+            cursor: pointer; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white; outline: none; backdrop-filter: blur(5px);
         }
         select option { background: #23a6d5; color: white; } 
 
-        input[type="range"] { 
-            width: 90%; 
-            margin-top: 10px; 
-            cursor: pointer; 
-            accent-color: #fff;
-        }
-
+        input[type="range"] { width: 90%; margin-top: 10px; cursor: pointer; accent-color: #fff; }
         .section { margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
-        
-        #statusText { 
-            font-weight: bold; 
-            margin-top: 25px; 
-            font-size: 1.1em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* Wadah untuk Roda Warna */
-        #colorPickerContainer {
-            display: flex;
-            justify-content: center;
-            margin-top: 15px;
-        }
+        #statusText { font-weight: bold; margin-top: 25px; font-size: 1.1em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        #colorPickerContainer { display: flex; justify-content: center; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -116,7 +56,7 @@
         </div>
 
         <div class="section">
-            <label for="efekSelect"><b>Pilih Efek Animasi (10 Mode):</b></label><br>
+            <label for="efekSelect"><b>Pilih Efek Animasi (20 Mode):</b></label><br>
             <select id="efekSelect" onchange="setEfek()">
                 <option value="0">Statis (Satu Warna)</option>
                 <option value="1">Pelangi Berputar</option>
@@ -128,6 +68,16 @@
                 <option value="7">Sapuan Warna (Color Wipe)</option>
                 <option value="8">Pelangi Berjalan (Theater Rainbow)</option>
                 <option value="9">Meteor Jatuh (Meteor Rain)</option>
+                <option value="10">Bintang Memudar (Twinkle)</option>
+                <option value="11">Nyala Api (Fire)</option>
+                <option value="12">Gelombang Aurora</option>
+                <option value="13">Ombak Samudra (Ocean Waves)</option>
+                <option value="14">Transisi Halus (Smooth Fade)</option>
+                <option value="15">Plasma / Lampu Lava</option>
+                <option value="16">Detak Jantung (Heartbeat)</option>
+                <option value="17">Bola Akrobatik (Juggling)</option>
+                <option value="18">Komet Kembar (Twin Comets)</option>
+                <option value="19">Hujan Warna (Confetti)</option>
             </select>
         </div>
 
@@ -145,12 +95,10 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <script>
-        // Konfigurasi Web App Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyDKIKwNt45Fak_3kuiIEKf5KfySsIP9dUc",
             authDomain: "lampu-pintar-iot.firebaseapp.com",
@@ -170,54 +118,35 @@
         const lampuKecerahanRef = database.ref('lampu/kecerahan');
         const lampuEfekRef = database.ref('lampu/efek'); 
 
-        // 1. Inisialisasi Roda Warna (Color Wheel)
         var colorPicker = new iro.ColorPicker("#colorPickerContainer", {
-            width: 200,          // Ukuran roda warna
-            color: "#ffffff",    // Warna bawaan awal
-            borderWidth: 2,      // Bingkai agar cocok dengan glassmorphism
-            borderColor: "rgba(255, 255, 255, 0.4)",
-            layout: [
-                { 
-                    component: iro.ui.Wheel // Hanya menampilkan roda warna bulat
-                }
-            ]
+            width: 200, color: "#ffffff", borderWidth: 2, borderColor: "rgba(255, 255, 255, 0.4)",
+            layout: [{ component: iro.ui.Wheel }]
         });
 
-        // 2. Event Listener Roda Warna (Hanya mengirim saat sentuhan dilepas)
         colorPicker.on('input:end', function(color) {
             const warnaBaru = color.hexString;
             lampuWarnaRef.set(warnaBaru);
             
-            // Otomatis pindah ke mode statis jika sedang di mode pelangi
+            // Pengecualian mode yang tidak butuh warna (pindah ke statis otomatis)
             const efekSaatIni = parseInt(document.getElementById('efekSelect').value);
-            if(efekSaatIni === 1 || efekSaatIni === 8) {
+            const modeOtomatis = [1, 8, 11, 13, 14, 15, 17, 19]; 
+            
+            if(modeOtomatis.includes(efekSaatIni)) {
                 document.getElementById('efekSelect').value = 0; 
                 lampuEfekRef.set(0);
             }
-            
-            setLampu(1); // Nyalakan otomatis
+            setLampu(1); 
         });
 
-        // 3. Monitor Status Teks
         lampuStatusRef.on('value', (snapshot) => {
             const status = snapshot.val();
             document.getElementById('statusText').innerText = status === 1 ? "Status Saat Ini: NYALA 🟢" : "Status Saat Ini: MATI 🔴";
             document.getElementById('statusText').style.color = status === 1 ? "#66ff99" : "#ff6666";
         });
 
-        // 4. Fungsi-fungsi Kontrol
-        function setLampu(nilai) {
-            lampuStatusRef.set(nilai);
-        }
-
-        function updateLabelKecerahan() {
-            document.getElementById('kecerahanValue').innerText = document.getElementById('brightnessSlider').value;
-        }
-        
-        function setKecerahan() {
-            lampuKecerahanRef.set(parseInt(document.getElementById('brightnessSlider').value));
-        }
-
+        function setLampu(nilai) { lampuStatusRef.set(nilai); }
+        function updateLabelKecerahan() { document.getElementById('kecerahanValue').innerText = document.getElementById('brightnessSlider').value; }
+        function setKecerahan() { lampuKecerahanRef.set(parseInt(document.getElementById('brightnessSlider').value)); }
         function setEfek() {
             const efekBaru = parseInt(document.getElementById('efekSelect').value);
             lampuEfekRef.set(efekBaru);
